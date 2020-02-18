@@ -2,13 +2,15 @@ package com.develogical.camera;
 
 public class Camera {
     private final Sensor sensor;
+    private final MemoryCard memoryCard;
 
-    public Camera(Sensor sensor) {
+    public Camera(Sensor sensor, MemoryCard memoryCard) {
         this.sensor = sensor;
+        this.memoryCard = memoryCard;
     }
 
     public void pressShutter() {
-        // not implemented
+        memoryCard.write(sensor.readData(), null);
     }
 
     public void powerOn() {
