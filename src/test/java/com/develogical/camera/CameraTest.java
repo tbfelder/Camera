@@ -15,7 +15,9 @@ public class CameraTest {
     @Test
     public void switchingTheCameraOffPowersDownTheSensor() {
         Sensor sensor = mock(Sensor.class);
-        new Camera(sensor, mock(MemoryCard.class)).powerOff();
+        Camera camera = new Camera(sensor, mock(MemoryCard.class));
+        camera.powerOn();
+        camera.powerOff();
         verify(sensor).powerDown();
     }
 
@@ -31,5 +33,18 @@ public class CameraTest {
         camera.pressShutter();
 
         verify(memoryCard).write(eq(new byte[]{42}), any());
+    }
+
+    @Test
+    public void pressingShutterWithPowerOffDoesNothing() {
+        Sensor sensor = mock(Sensor.class);
+        MemoryCard memoryCard = mock(MemoryCard.class);
+
+        Camera camera = new Camera(sensor, memoryCard);
+        camera.powerOff();
+        camera.pressShutter();
+
+        verifyNoMoreInteractions(memoryCard);
+        verifyNoMoreInteractions(sensor);
     }
 }

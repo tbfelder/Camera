@@ -4,21 +4,29 @@ public class Camera {
     private final Sensor sensor;
     private final MemoryCard memoryCard;
 
+    private boolean isOn = false;
+
     public Camera(Sensor sensor, MemoryCard memoryCard) {
         this.sensor = sensor;
         this.memoryCard = memoryCard;
     }
 
     public void pressShutter() {
-        memoryCard.write(sensor.readData(), null);
+        if (isOn) {
+            memoryCard.write(sensor.readData(), null);
+        }
     }
 
     public void powerOn() {
+        isOn = true;
         sensor.powerUp();
     }
 
     public void powerOff() {
-       sensor.powerDown();
+        if (isOn) {
+            sensor.powerDown();
+        }
+        isOn = false;
     }
 }
 
