@@ -91,16 +91,15 @@ public class CameraTest {
 
         when(sensor.readData()).thenReturn(new byte[]{42});
 
+        ArgumentCaptor<WriteCompleteListener> captor = ArgumentCaptor.forClass(WriteCompleteListener.class);
+        doNothing().when(memoryCard).write(any(), captor.capture());
+
         Camera camera = new Camera(sensor, memoryCard);
         camera.powerOn();
         camera.pressShutter();
         camera.powerOff();
 
-        ArgumentCaptor<WriteCompleteListener> captor = ArgumentCaptor.forClass(WriteCompleteListener.class);
-
-        verify(memoryCard).write(eq(new byte[]{42}), captor.capture());
         verify(sensor, never()).powerDown();
-
         captor.getValue().writeComplete();
         verify(sensor).powerDown();
     }
