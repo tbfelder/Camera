@@ -5,6 +5,7 @@ public class Camera {
     private final MemoryCard memoryCard;
 
     private boolean isOn = false;
+    private boolean dataBeingWritten = false;
 
     public Camera(Sensor sensor, MemoryCard memoryCard) {
         this.sensor = sensor;
@@ -13,6 +14,7 @@ public class Camera {
 
     public void pressShutter() {
         if (isOn) {
+            dataBeingWritten = true;
             memoryCard.write(sensor.readData(), null);
         }
     }
@@ -23,7 +25,7 @@ public class Camera {
     }
 
     public void powerOff() {
-        if (isOn) {
+        if (isOn && !dataBeingWritten) {
             sensor.powerDown();
         }
         isOn = false;

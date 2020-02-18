@@ -47,4 +47,19 @@ public class CameraTest {
         verifyNoMoreInteractions(memoryCard);
         verifyNoMoreInteractions(sensor);
     }
+
+    @Test
+    public void ifDataIsBeingWrittenSwitchingCameraOffDoesNotPowerDownSensor() {
+        Sensor sensor = mock(Sensor.class);
+        MemoryCard memoryCard = mock(MemoryCard.class);
+
+        when(sensor.readData()).thenReturn(new byte[]{42});
+
+        Camera camera = new Camera(sensor, memoryCard);
+        camera.powerOn();
+        camera.pressShutter();
+        camera.powerOff();
+
+        verify(sensor, never()).powerDown();
+    }
 }
