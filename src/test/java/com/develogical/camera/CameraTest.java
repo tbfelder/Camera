@@ -1,6 +1,7 @@
 package com.develogical.camera;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.mockito.Mockito.*;
 
@@ -61,5 +62,46 @@ public class CameraTest {
         camera.powerOff();
 
         verify(sensor, never()).powerDown();
+    }
+
+    @Test
+    public void sensorIsNotSwitchedOffAfterDataFinishedWritingIfCameraOn() {
+        Sensor sensor = mock(Sensor.class);
+        MemoryCard memoryCard = mock(MemoryCard.class);
+
+        when(sensor.readData()).thenReturn(new byte[]{42});
+
+        Camera camera = new Camera(sensor, memoryCard);
+        camera.powerOn();
+        camera.pressShutter();
+
+        ArgumentCaptor<WriteCompleteListener> captor = ArgumentCaptor.forClass(WriteCompleteListener.class);
+
+        verify(memoryCard).write(eq(new byte[]{42}), captor.capture());
+        verify(sensor, never()).powerDown();
+
+        captor.getValue().writeComplete();
+        verify(sensor, never()).powerDown();
+    }
+
+    @Test
+    public void sensorIsSwitchedOffAfterDataFinishedWritingIfCameraOff() {
+        Sensor sensor = mock(Sensor.class);
+        MemoryCard memoryCard = mock(MemoryCard.class);
+
+        when(sensor.readData()).thenReturn(new byte[]{42});
+
+        Camera camera = new Camera(sensor, memoryCard);
+        camera.powerOn();
+        camera.pressShutter();
+        camera.powerOff();
+
+        ArgumentCaptor<WriteCompleteListener> captor = ArgumentCaptor.forClass(WriteCompleteListener.class);
+
+        verify(memoryCard).write(eq(new byte[]{42}), captor.capture());
+        verify(sensor, never()).powerDown();
+
+        captor.getValue().writeComplete();
+        verify(sensor).powerDown();
     }
 }

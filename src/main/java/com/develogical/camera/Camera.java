@@ -15,7 +15,12 @@ public class Camera {
     public void pressShutter() {
         if (isOn) {
             dataBeingWritten = true;
-            memoryCard.write(sensor.readData(), null);
+            memoryCard.write(sensor.readData(), () -> {
+                dataBeingWritten = false;
+                if (!isOn) {
+                    sensor.powerDown();
+                }
+            });
         }
     }
 
