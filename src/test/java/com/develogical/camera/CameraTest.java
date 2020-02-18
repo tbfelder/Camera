@@ -8,6 +8,8 @@ import static org.mockito.Mockito.*;
 public class CameraTest {
     @Test
     public void switchingTheCameraOnPowersUpTheSensor() {
-        // write your test here
+        Sensor sensor = mock(Sensor.class);
+        new Camera(sensor).powerOn();
+        verify(sensor).powerUp();
     }
 }
