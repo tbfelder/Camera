@@ -12,4 +12,11 @@ public class CameraTest {
         new Camera(sensor).powerOn();
         verify(sensor).powerUp();
     }
+
+    @Test
+    public void switchingTheCameraOffPowersDownTheSensor() {
+        Sensor sensor = mock(Sensor.class);
+        new Camera(sensor).powerOff();
+        verify(sensor).powerDown();
+    }
 }
