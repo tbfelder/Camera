@@ -1,6 +1,7 @@
 package com.develogical.camera;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -39,6 +40,39 @@ public class CameraTest {
         underTest.pressShutter();
 
         verify(memoryCard).write(eq(expectedData), any());
+
+    }
+
+    @Test
+    public void shutterUnderPowerOffDoesNothing() {
+
+        underTest.powerOff();
+        underTest.pressShutter();
+
+        verify(sensor).powerDown();
+        verifyNoMoreInteractions(memoryCard, sensor);
+
+    }
+
+    @Test
+    public void PowerOffDoesNothingIfDataIsBeingWritten(){
+
+        ArgumentCaptor<WriteCompleteListener> writeCompleteListenerCaptor = ArgumentCaptor.forClass(WriteCompleteListener.class);
+
+        underTest.powerOn();
+        underTest.pressShutter();
+
+        underTest.powerOff();
+
+        verify(memoryCard).write(any(), writeCompleteListenerCaptor.capture() );
+        verify(sensor, times(0)).powerDown();
+        // still writing
+
+        WriteCompleteListener writeCompleteListener = writeCompleteListenerCaptor.getValue();
+        writeCompleteListener.writeComplete();
+
+        // finished writing
+        verify(sensor).powerDown();
 
     }
 }
